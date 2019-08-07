@@ -12,15 +12,17 @@
               <button class="find_input" type="button" @click="showFind">Сменить город</button>
             </div>
             <div class="d-flex align-items-end ml-3">
-              <span><i class="fas fa-location-arrow pr-1"></i>Мое местоположение</span>
+              <button class="find_input" @click="geoUser"><i class="fas fa-location-arrow pr-1"></i>Мое местоположение</button>
             </div>
           </div>
         </div>
         <div class="col-5 d-flex justify-content-end align-items-center pr-0">
+          <span>C°</span>
           <div class="custom-control custom-switch">
-            <input type="checkbox" class="custom-control-input" id="customSwitch1">
+            <input type="checkbox" class="custom-control-input" id="customSwitch1" @change="changeUnits">
             <label class="custom-control-label" for="customSwitch1"></label>
           </div>
+          <span>F°</span>
         </div>
       </div>
     </div>
@@ -86,8 +88,8 @@ export default {
           pressure: '',
           humidity:'',
           cloudsAll:'',
-
-      }
+      },
+      units: 'metric'
     }
   },
   methods: {
@@ -95,8 +97,8 @@ export default {
       this.findInput = true;
     },
      getData() {
-        axios.get(`http://api.openweathermap.org/data/2.5/weather?q=` + this.nameTown + `&appid=e275f27c1a9f13ff0b3f1746b12fd26c&units=metric&lang=ru`).then(res => {
-          this.dataWeather.temp = res.data.main.temp;
+        axios.get(`http://api.openweathermap.org/data/2.5/weather?q=` + this.nameTown + `&appid=e275f27c1a9f13ff0b3f1746b12fd26c&units=` + this.units + `&lang=ru`).then(res => {
+          this.dataWeather.temp = Math.trunc(res.data.main.temp);
           this.dataWeather.name = res.data.name;
           this.dataWeather.clouds = res.data.weather[0].description;
           this.dataWeather.cloudsType = res.data.weather[0].main;
@@ -140,6 +142,26 @@ export default {
         this.dataWeather.logo = './assets/cloud.png'
       } else if (type === 'Clear') {
         this.dataWeather.logo = './assets/sun.png'
+      }
+    },
+    geoUser() {
+      navigator.geolocation.getCurrentPosition((position) => {
+        let lon = Math.trunc(position.coords.longitude);
+        let lat = Math.trunc(position.coords.latitude);
+        axios.get(`http://api.openweathermap.org/data/2.5/weather?lat=` + lat + `&lon=` + lon + `&appid=e275f27c1a9f13ff0b3f1746b12fd26c`).then(res => {
+          this.nameTown = res.data.name;
+          this.getData();
+        })
+      })
+    },
+    changeUnits(){
+      console.log(this.units);
+      if(this.units === 'metric'){
+        this.units = 'imperial';
+        this.getData();
+      } else {
+        this.units = 'metric';
+        this.getData();
       }
     }
   },
