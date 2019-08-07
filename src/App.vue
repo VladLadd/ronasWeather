@@ -6,7 +6,7 @@
           <div class="d-flex" v-if="findInput">
             <input v-model="nameTown" class="form-control form-control-sm py-3" type="text" placeholder="Введите название города"><button class="btn_ok" @click="changeTown">OK</button>
           </div>
-          <div class="d-flex" v-else>
+          <div class="row mx-0" v-else>
             <div class="d-flex align-items-start flex-column">
               <h1>{{dataWeather.name}}</h1>
               <button class="find_input" type="button" @click="showFind">Сменить город</button>
@@ -44,7 +44,8 @@
     <div class="row justify-content-between align-items-center mx-0">
       <div class="d-flex flex-column align-items-start">
         <span>Ветер</span>
-        <h2>{{dataWeather.wind.speed}} м/с, {{dataWeather.windDegName}}</h2>
+        <h2 v-if="units === 'metric'">{{dataWeather.wind.speed}} м/с, {{dataWeather.windDegName}}</h2>
+        <h2 v-else>{{dataWeather.wind.speed}} фут/с, {{dataWeather.windDegName}}</h2>
       </div>
       <div class="d-flex flex-column align-items-start">
         <span>Давление</span>
@@ -155,7 +156,6 @@ export default {
       })
     },
     changeUnits(){
-      console.log(this.units);
       if(this.units === 'metric'){
         this.units = 'imperial';
         this.getData();
@@ -163,6 +163,8 @@ export default {
         this.units = 'metric';
         this.getData();
       }
+
+
     }
   },
   mounted() {
